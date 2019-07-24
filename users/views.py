@@ -1,7 +1,8 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm
+from .forms import UserRegisterForm,UserUpdateForm,ProfileUpdateForm,EmailPostForm
+from .email import send_welcome_email
 
 
 def register(request):
@@ -39,3 +40,19 @@ def profile(request):
 
     }
     return render(request, 'users/profile.html', context)
+
+
+def post_share(request, post_id):
+    # Retrieve post by id
+    post = get_object_or_404(Post, id=post_id, status='published')
+
+    if request.method == 'POST':
+        # Form was submitted
+        form = EmailPostForm(request.POST)
+        if form.is_valid():
+            # Form fields passed validation
+            cd = form.cleaned_data
+            # ... send email
+    else:
+        form = EmailPostForm()
+    return render(request, 'blog/post/share.html', {'post': post,'form': form})
